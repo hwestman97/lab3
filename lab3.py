@@ -43,11 +43,14 @@ def a_b_c(text):
             print('Fel!!!!!!!!!!!!!')
 
 def uppgift_a(text):
-    alpha, beta = calc(text)
-    print(alpha)
-    print(beta)
-    plot1 = plotGraph([1,2,3,4],[1,2,3,4])
-    print(plot1)
+    dictionary_xy = x_y(text)
+    alpha, beta = cal(dictionary_xy)
+    print(alpha, '\n', beta)
+    #plt.plot([1,2,3],[1,2,3])
+    #plt.plot(*zip(*sorted(dictionary_xy.items())))
+    for key in dictionary_xy:
+        plt.scatter(key, dictionary_xy[key])
+    plt.show()
 
 def plotGraph(X,Y):
     fignum = random.randint(0,100)
@@ -66,32 +69,37 @@ def open_file():
     text = open(file, 'r')
     return text
 
-def calc(text):
+def x_y(text):  
     n = 0
-    sum_x = 0
-    sum_y = 0
-    product_xy = 0
-    square_x = 0
-    square_y = 0
+    xy = {}
     for line in text:
         n += 1
         no_new_line = line.strip()
         new_line = no_new_line.split("\t")
-        x = float(new_line[0])
-        y = float(new_line[1])
-        sum_x += x
-        sum_y += y
-        product_xy += x*y
-        square_x += x**2
-        square_y += y**2
-    beta = (n*product_xy - sum_x*sum_y)/(n*square_x - sum_x*sum_x)
-    alpha = sum_y/n - beta*sum_x/n
+        x_i = float(new_line[0])
+        y_i = float(new_line[1])
+        xy[x_i] = y_i
+    return xy
+
+def cal(xy):
+    m = len(xy)
+    sum_x = 0
+    sum_y = 0
+    product_xy = 0
+    square_x = 0
+    square_y = 0     
+    for key in xy:
+        sum_x += key
+        sum_y += xy[key]
+        product_xy += key*xy[key]
+        square_x += key**2
+        square_y += xy[key]**2
+    beta = (m*product_xy - sum_x*sum_y)/(m*square_x - sum_x*sum_x)
+    alpha = sum_y/m - beta*sum_x/m
     return alpha, beta
 
 def main():
-
     text = open_file()
     uppgift_a(text)
     
-plt.plot(3, 2)
-print('TEST')
+main()
