@@ -32,31 +32,29 @@ def a_b_c(text):
         choice = choice.lower()
         if choice == 'a':
             uppgift_a(text)
-            x=False
+            x = False
         elif choice == 'b':
             uppgift_b(text)
-            x=False
+            x = False
         elif choice == 'c':
             uppgift_c(text)
-            x=False
+            x = False
         else:
-            print('Fel!!!!!!!!!!!!!')
+            print('Datorn förstod inte vad du ville göra, försök igen!')
 
 def uppgift_a(text):
     dictionary_xy = x_y(text)
-    alpha, beta = cal(dictionary_xy)
-    print(alpha, '\n', beta)
-    #plt.plot([1,2,3],[1,2,3])
-    #plt.plot(*zip(*sorted(dictionary_xy.items())))
-    for key in dictionary_xy:
-        plt.scatter(key, dictionary_xy[key])
-    plt.show()
+    alpha, beta = calc(dictionary_xy)
+    plotGraph(dictionary_xy)
 
-def plotGraph(X,Y):
-    fignum = random.randint(0,100)
-    plt.figure(fignum)
-    ### Plotting arrangements ###
-    return fignum
+
+def plotGraph(dictionary):
+    for key in dictionary:
+        plt.scatter(key, dictionary[key], c='darkblue')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.plot([-200,400],[0,150],linewidth=3.0, c='red')
+    plt.show()
 
 def uppgift_b(text):
     pass
@@ -69,11 +67,9 @@ def open_file():
     text = open(file, 'r')
     return text
 
-def x_y(text):  
-    n = 0
+def x_y(text):
     xy = {}
     for line in text:
-        n += 1
         no_new_line = line.strip()
         new_line = no_new_line.split("\t")
         x_i = float(new_line[0])
@@ -81,7 +77,7 @@ def x_y(text):
         xy[x_i] = y_i
     return xy
 
-def cal(xy):
+def calc(xy):
     m = len(xy)
     sum_x = 0
     sum_y = 0
@@ -96,6 +92,8 @@ def cal(xy):
         square_y += xy[key]**2
     beta = (m*product_xy - sum_x*sum_y)/(m*square_x - sum_x*sum_x)
     alpha = sum_y/m - beta*sum_x/m
+    print(u'\u03B1'+ ' = '+ str(alpha))
+    print(u'\u03B2'+ ' = '+ str(beta))
     return alpha, beta
 
 def main():
