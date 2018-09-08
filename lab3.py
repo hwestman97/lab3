@@ -46,8 +46,8 @@ def uppgift_a(text):
     alpha, beta = calc(text)
     print(alpha)
     print(beta)
-    plot1 = plotGraph(alpha + beta*x, x)
-    (alpha,beta)
+    plot1 = plotGraph([1,2,3,4],[1,2,3,4])
+    print(plot1)
 
 def plotGraph(X,Y):
     fignum = random.randint(0,100)
@@ -93,4 +93,5 @@ def main():
     text = open_file()
     uppgift_a(text)
     
-main()
+plt.plot(3, 2)
+print('TEST')
