@@ -8,6 +8,7 @@ Created on Thu Sep  6 13:20:35 2018
 import timeit
 import matplotlib.pyplot as plt
 import random
+from matplotlib.backends.backend_pdf import PdfPages
 
 '''
 If you want to compare two blocks of code / functions quickly you could do:
@@ -45,16 +46,21 @@ def a_b_c(text):
 def uppgift_a(text):
     dictionary_xy = x_y(text)
     alpha, beta = calc(dictionary_xy)
-    plotGraph(dictionary_xy)
+    plotGraph(dictionary_xy, alpha, beta)
 
-
-def plotGraph(dictionary):
+def plotGraph(dictionary, alpha, beta):
+    f = plt.figure()
     for key in dictionary:
         plt.scatter(key, dictionary[key], c='darkblue')
     plt.xlabel('x')
     plt.ylabel('y')
-    plt.plot([-200,400],[0,150],linewidth=3.0, c='red')
+    x1 = min(dictionary)
+    x2 = max(dictionary)
+    y1 = alpha + beta*x1
+    y2 = alpha + beta*x2
+    plt.plot([x1,x2],[y1,y2],linewidth=3.0, c='red')
     plt.show()
+    f.savefig('test_a.pdf')
 
 def uppgift_b(text):
     pass
@@ -98,6 +104,6 @@ def calc(xy):
 
 def main():
     text = open_file()
-    uppgift_a(text)
+    a_b_c(text)
     
 main()
