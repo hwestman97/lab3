@@ -8,7 +8,7 @@ Created on Thu Sep  6 13:20:35 2018
 import timeit
 import matplotlib.pyplot as plt
 import random
-from matplotlib.backends.backend_pdf import PdfPages
+import numpy as np
 
 '''
 If you want to compare two blocks of code / functions quickly you could do:
@@ -32,7 +32,8 @@ def a_b_c(text):
         choice = input('Vill du använda metod a, b, eller c? ')
         choice = choice.lower()
         if choice == 'a':
-            uppgift_a(text)
+            f = uppgift_a(text)
+            return f
             x = False
         elif choice == 'b':
             uppgift_b(text)
@@ -46,7 +47,8 @@ def a_b_c(text):
 def uppgift_a(text):
     dictionary_xy = x_y(text)
     alpha, beta = calc(dictionary_xy)
-    plotGraph(dictionary_xy, alpha, beta)
+    f = plotGraph(dictionary_xy, alpha, beta)
+    return f
 
 def plotGraph(dictionary, alpha, beta):
     f = plt.figure()
@@ -60,10 +62,12 @@ def plotGraph(dictionary, alpha, beta):
     y2 = alpha + beta*x2
     plt.plot([x1,x2],[y1,y2],linewidth=3.0, c='red')
     plt.show()
-    f.savefig('test_a.pdf')
+    return f
 
 def uppgift_b(text):
-    pass
+    a = np.loadtxt(text)
+    x, y = a.sum(axis=0)
+    print(x,y)
 
 def uppgift_c(text):
     pass
@@ -71,7 +75,8 @@ def uppgift_c(text):
 def open_file():
     file = input('Vad är namnet på din fil? ')
     text = open(file, 'r')
-    return text
+    file = file[:-4]
+    return text, file
 
 def x_y(text):
     xy = {}
@@ -103,7 +108,9 @@ def calc(xy):
     return alpha, beta
 
 def main():
-    text = open_file()
+    text, file = open_file()
+    #f = 
     a_b_c(text)
+    #f.savefig('%s_a.pdf' % file)
     
 main()
