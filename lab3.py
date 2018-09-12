@@ -5,22 +5,9 @@ Created on Thu Sep  6 13:20:35 2018
 @author: Hanna
 """
 
-import timeit
 import matplotlib.pyplot as plt
-import random
 import numpy as np
-
-'''
-If you want to compare two blocks of code / functions quickly you could do:
-
-start_time = timeit.default_timer()
-func1()
-print(timeit.default_timer() - start_time)
-
-start_time = timeit.default_timer()
-func2()
-print(timeit.default_timer() - start_time)
-'''
+from scipy import stats
 
 def a_b_c(text):
     '''
@@ -32,8 +19,7 @@ def a_b_c(text):
         choice = input('Vill du använda metod a, b, eller c? ')
         choice = choice.lower()
         if choice == 'a':
-            f = uppgift_a(text)
-            return f
+            uppgift_a(text)
             x = False
         elif choice == 'b':
             uppgift_b(text)
@@ -65,12 +51,30 @@ def plotGraph(dictionary, alpha, beta):
     return f
 
 def uppgift_b(text):
-    a = np.loadtxt(text)
-    x, y = a.sum(axis=0)
-    print(x,y)
+    x, y = b_c(text)
+    beta, alpha = np.polyfit(x, y, 1)
+    print(u'\u03B1'+ ' = '+ str(alpha))
+    print(u'\u03B2'+ ' = '+ str(beta))
+    plt.scatter(x,y)
+    plt.plot(x, beta * x + alpha, '-', color='red')
+    plt.show()
 
 def uppgift_c(text):
-    pass
+    a = np.loadtxt(text)
+    x = a[0:,0]
+    y = a[0:,1]
+    beta, alpha, r_value, p_value, std_err = stats.linregress(x, y)
+    print(u'\u03B1'+ ' = '+ str(alpha))
+    print(u'\u03B2'+ ' = '+ str(beta))
+    plt.scatter(x,y)
+    plt.plot(x, beta * x + alpha, '-', color='red')
+    plt.show()
+
+def b_c(text):
+    a = np.loadtxt(text)
+    x = a[0:,0]
+    y = a[0:,1]
+    return x,y
 
 def open_file():
     file = input('Vad är namnet på din fil? ')
@@ -114,3 +118,9 @@ def main():
     #f.savefig('%s_a.pdf' % file)
     
 main()
+'''
+open_file ska inte köras i b & c, eller iaf inte i c
+rubriker och skit i graferna
+slå ihop plotbestämningarna för a, b, c
+skriv om open_file???
+'''
