@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Sep  6 13:20:35 2018
-
-@author: Hanna
-"""
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,44 +9,88 @@ font = {'family': 'serif',
         'size': 20,
         }
 
-def a_b_c():
+def main():
     '''
     Frågar användaren om de vill lösa problemet med bara python, alternativ A, 
     numbpy, alternativ B, eller numbpy och scipy, alternativ C.
     '''
-    x = True
-    while x == True:
+    print('''Det här programmet tar en fil med x- och y-värden och utför en enkel 
+linjär regression på punkterna. Programmet retunerar värdena på alfa och beta 
+och plottar sedan en graf med både punkterna och regressionslinjen som sparas
+som en pdf. Metod a använder sig av ren python, metod b av numpy och metod c 
+av både numpy och scipy. Avsluta programmet genom att trycka Q.''')
+    Loop = True 
+    while Loop == True:
         choice = input('Vill du använda metod a, b, eller c? ')
-        choice = choice.lower()
-        if choice == 'a':
-            f, file= uppgift_a()
-            save_file(choice, file, f)
-            x = False
-        elif choice == 'b':
-            f, file = uppgift_b()
-            #save_file(choice, file, f)
-            x = False
-        elif choice == 'c':
-            f, file = uppgift_c()
-            #save_file(choice, file, f)
-            x = False
+        choice = choice.lower() #Omvandlar alla bokstäver till små bokstäver
+        if choice == 'a' or choice == 'b' or choice == 'c':
+            get_file(choice)
+            Loop = False
+        elif choice == 'q':
+            Loop = False
         else:
             print('Datorn förstod inte vad du ville göra, försök igen!')
 
-def uppgift_a():
-    dictionary_xy, alpha, beta, file = calc()
+def get_file(choice):
+    '''
+    Skriv in ett giltigt filnamn med x- och y-värden, funktionen kollar att filen
+    finns och inte är tom, anropar sedan funktionen som korresponderar till den 
+    metod du valde. Till sist sparas grafen i pdf-format.
+    '''
+    Loop = True
+    felmeddelande = '\nNågot är fel med din fil, försök igen!'
+    error = (ValueError, FileNotFoundError, ZeroDivisionError, IOError, IndexError)
+    #Loopen är till för att användaren ska få försöka skriva in en fil flera gånger
+    #Funktionen testar också för vanliga fel med filen
+    while Loop == True:
+        file = input('Vad är namnet på din fil? ')
+        filename = file[:-4]
+        try:
+            if file == 'q':
+                Loop = False
+            elif choice == 'a':
+                    f = uppgift_a(file)
+                    save_file(choice, filename, f)
+                    Loop = False
+            elif choice == 'b':
+                    f = uppgift_b(file)
+                    save_file(choice, filename, f)
+                    Loop = False
+            elif choice == 'c':
+                    f = uppgift_c(file)
+                    save_file(choice, filename, f)
+                    Loop = False
+        except error:
+            print(felmeddelande)
+
+def uppgift_a(file):
+    '''
+    Det här är metod a:s kodskelett, funktionen kallar på de nödvändiga subfunktionerna
+    för att kunna gå från en fil med x- och y-värden till en graf med värden på
+    alfa och beta.
+    '''
+    dictionary_xy, alpha, beta = calc(file)
     print_alphabeta(alpha, beta)
     f = plot_a(dictionary_xy, alpha, beta, file)
-    return f, file
+    return f
 
 def save_file(choice, file, f):
+    '''
+    Den här funktionen sparar en graf till pdf-format.
+    '''
     f.savefig('%s_%s.pdf' % (file, choice))
 
 def print_alphabeta(alpha, beta):
+    '''
+    Den här funktionen printar ut värdena på alfa och beta.
+    '''
     print(u'\u03B1'+ ' = '+ str(alpha))
     print(u'\u03B2'+ ' = '+ str(beta))
 
 def plot_a(dictionary, alpha, beta, file):
+    '''
+    Plottar grafen med metod a, dvs ren python.
+    '''
     f = plt.figure()
     for key in dictionary:
         plt.scatter(key, dictionary[key], c='blue')
@@ -69,21 +107,34 @@ def plot_a(dictionary, alpha, beta, file):
     plt.show()
     return f    
 
-def uppgift_b():
-    x, y, file = b_c()
+def uppgift_b(file):
+    '''
+    Det här är metod b:s kodskelett, funktionen kallar på de nödvändiga subfunktionerna
+    för att kunna gå från en fil med x- och y-värden till en graf med värden på
+    alfa och beta.
+    '''    
+    x, y = b_c(file)
     beta, alpha = np.polyfit(x, y, 1)
     print_alphabeta(alpha, beta)
     f = plot_bc(x, y, alpha, beta, file)
-    return f, file
+    return f
 
-def uppgift_c():
-    x, y, file = b_c()
+def uppgift_c(file):
+    '''
+    Det här är metod c:s kodskelett, funktionen kallar på de nödvändiga subfunktionerna
+    för att kunna gå från en fil med x- och y-värden till en graf med värden på
+    alfa och beta.
+    '''    
+    x, y = b_c(file)
     beta, alpha, r_value, p_value, std_err = stats.linregress(x, y)
     print_alphabeta(alpha, beta)
     f = plot_bc(x, y, alpha, beta, file)
-    return f, file
+    return f
 
 def plot_bc(x, y, alpha, beta, file):
+    '''
+    Funktionen plottar en graf enligt metod b och c.
+    '''
     labels = ['Regressionslinje', 'Datapunkter']
     f = plt.figure()
     plt.scatter(x,y)
@@ -95,16 +146,21 @@ def plot_bc(x, y, alpha, beta, file):
     plt.show()   
     return f
 
-def b_c():
-    file = input('Vad är namnet på din fil? ')
+def b_c(file):
+    '''
+    Omvandlar användarens fil till två arrays som sedan retuneras.
+    '''
     a = np.loadtxt(file)
-    file = file[:-4]
     x = a[0:,0]
     y = a[0:,1]
-    return x, y, file
+    return x, y
 
-def calc():
-    file = input('Vad är namnet på din fil? ')    
+def calc(file):
+    '''
+    Med metod a ska all summering och beräknning av inre punkter ske med ren
+    python vilket är vad den här funktionen gör, sedan beräknar den alfa och
+    beta, omvandlar filen till en dictionary och retunerar alfa o´ch beta.
+    '''
     xy = {}
     with open(file, 'r') as f:
         for line in f:
@@ -113,7 +169,6 @@ def calc():
             x_i = float(new_line[0])
             y_i = float(new_line[1])
             xy[x_i] = y_i
-    file = file[:-4]
     m = len(xy)
     sum_x = 0
     sum_y = 0
@@ -128,6 +183,6 @@ def calc():
         square_y += xy[key]**2 #Uppgiften söger att man ska beräkna summan av kvadraterna av y men den används inte i programmet
     beta = (m*product_xy - sum_x*sum_y)/(m*square_x - sum_x*sum_x)
     alpha = sum_y/m - beta*sum_x/m
-    return xy, alpha, beta, file
+    return xy, alpha, beta
 
-a_b_c()
+main()
