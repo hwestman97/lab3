@@ -9,6 +9,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 
+font = {'family': 'serif',
+        'color':  'black',
+        'weight': 'normal',
+        'size': 20,
+        }
 
 def a_b_c():
     '''
@@ -25,20 +30,19 @@ def a_b_c():
             x = False
         elif choice == 'b':
             f, file = uppgift_b()
-            save_file(choice, file, f)
+            #save_file(choice, file, f)
             x = False
         elif choice == 'c':
             f, file = uppgift_c()
-            save_file(choice, file, f)
+            #save_file(choice, file, f)
             x = False
         else:
             print('Datorn förstod inte vad du ville göra, försök igen!')
 
 def uppgift_a():
-    text, file = open_file()
-    dictionary_xy, alpha, beta = calc(text)
+    dictionary_xy, alpha, beta, file = calc()
     print_alphabeta(alpha, beta)
-    f = plotGraph(dictionary_xy, alpha, beta)
+    f = plot_a(dictionary_xy, alpha, beta, file)
     return f, file
 
 def save_file(choice, file, f):
@@ -48,10 +52,11 @@ def print_alphabeta(alpha, beta):
     print(u'\u03B1'+ ' = '+ str(alpha))
     print(u'\u03B2'+ ' = '+ str(beta))
 
-def plotGraph(dictionary, alpha, beta):
+def plot_a(dictionary, alpha, beta, file):
     f = plt.figure()
     for key in dictionary:
         plt.scatter(key, dictionary[key], c='blue')
+    labels = ['Regressionslinje', 'Datapunkter']
     plt.xlabel('x')
     plt.ylabel('y')
     x1 = min(dictionary)
@@ -59,51 +64,56 @@ def plotGraph(dictionary, alpha, beta):
     y1 = alpha + beta*x1
     y2 = alpha + beta*x2
     plt.plot([x1,x2],[y1,y2],linewidth=3.0, c='red')
+    plt.legend(labels)
+    plt.title(file, fontdict=font)
     plt.show()
     return f    
 
 def uppgift_b():
-    text, file = open_file()
-    x, y = b_c(text)
+    x, y, file = b_c()
     beta, alpha = np.polyfit(x, y, 1)
     print_alphabeta(alpha, beta)
-    f = plt.figure()
-    plt.scatter(x,y)
-    plt.plot(x, beta * x + alpha, '-',linewidth=3.0, color='red')
-    plt.show()
+    f = plot_bc(x, y, alpha, beta, file)
     return f, file
 
 def uppgift_c():
-    text, file = open_file()
-    x, y = b_c(text)
+    x, y, file = b_c()
     beta, alpha, r_value, p_value, std_err = stats.linregress(x, y)
     print_alphabeta(alpha, beta)
+    f = plot_bc(x, y, alpha, beta, file)
+    return f, file
+
+def plot_bc(x, y, alpha, beta, file):
+    labels = ['Regressionslinje', 'Datapunkter']
     f = plt.figure()
     plt.scatter(x,y)
     plt.plot(x, beta * x + alpha, '-',linewidth=3.0, color='red')
-    plt.show()
-    return f, file
+    plt.xlabel('x')
+    plt.ylabel('y')    
+    plt.legend(labels)
+    plt.title(file, fontdict=font)
+    plt.show()   
+    return f
 
-def b_c(text):
-    a = np.loadtxt(text)
+def b_c():
+    file = input('Vad är namnet på din fil? ')
+    a = np.loadtxt(file)
+    file = file[:-4]
     x = a[0:,0]
     y = a[0:,1]
-    return x,y
+    return x, y, file
 
-def open_file():
-    file = input('Vad är namnet på din fil? ')
-    text = open(file, 'r')
-    file = file[:-4]
-    return text, file
-
-def calc(text):
+def calc():
+    file = input('Vad är namnet på din fil? ')    
     xy = {}
-    for line in text:
-        no_new_line = line.strip('\n')
-        new_line = no_new_line.split("\t")
-        x_i = float(new_line[0])
-        y_i = float(new_line[1])
-        xy[x_i] = y_i
+    with open(file, 'r') as f:
+        for line in f:
+            no_new_line = line.strip()
+            new_line = no_new_line.split("\t")
+            x_i = float(new_line[0])
+            y_i = float(new_line[1])
+            xy[x_i] = y_i
+    file = file[:-4]
     m = len(xy)
     sum_x = 0
     sum_y = 0
@@ -115,20 +125,9 @@ def calc(text):
         sum_y += xy[key]
         product_xy += key*xy[key]
         square_x += key**2
-        square_y += xy[key]**2
+        square_y += xy[key]**2 #Uppgiften söger att man ska beräkna summan av kvadraterna av y men den används inte i programmet
     beta = (m*product_xy - sum_x*sum_y)/(m*square_x - sum_x*sum_x)
     alpha = sum_y/m - beta*sum_x/m
-    return xy, alpha, beta
+    return xy, alpha, beta, file
 
-def main():
-    a_b_c()
-    
-main()
-'''
-open_file ska inte köras i b & c, eller iaf inte i c
-rubriker och skit i graferna
-slå ihop plotbestämningarna för a, b, c
-skriv om open_file???
-Astrids grej om random
-gör dig av med listor
-'''
+a_b_c()
